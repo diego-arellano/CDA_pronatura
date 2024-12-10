@@ -1,7 +1,3 @@
-!pip install geopandas
-!pip install folium
-!pip install streamlit_folium
-
 import streamlit as st
 import geopandas as gpd
 import folium
