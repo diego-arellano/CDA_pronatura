@@ -7,10 +7,10 @@ import branca.colormap as cm
 
 
 # Título del dashboard
-st.title("Dashboard de Mapa con GeoDataFrame")
+st.title("Identificación de las áreas más favorables para la recarga de acuíferos")
 
 # Carga de datos
-st.sidebar.header("Cargar GeoDataFrame")
+st.sidebar.header("Cargar archivo")
 uploaded_file = st.sidebar.file_uploader("Sube un archivo GeoJSON", type=["geojson"])
 
 if uploaded_file:
@@ -24,27 +24,32 @@ if uploaded_file:
     
     # Mostrar información básica
     st.sidebar.header("Opciones del Mapa")
-    st.write("Vista previa del GeoDataFrame:")
+    st.write("Vista previa de los datos:")
     st.write(gdf.head())
     
     # Selección de columna para color (opcional)
     col_options = ["VALOR","cluster_kmeans"]
     color_column = st.sidebar.selectbox("Selecciona una columna para colorear el mapa", col_options)
-    col_options_com = list(gdf.columns)
+    col_options_com = ["VALOR", "LITOLOGIA", "Tipo_de_roca", "Descripcion_suelo", "Descripcion_textura", "Rango_evapotranspiracion", "Rango_precipitacion", "Descripcion_usos_de_suelo", "nombre_zonas_de_recarga", "cluster_kmeans"]
 
     min_val, max_val = gdf[color_column].min(), gdf[color_column].max()
-    selected_range = st.sidebar.slider(
-        f"Selecciona el rango de {color_column}",
-        min_value=int(min_val),
-        max_value=int(max_val),
-        value=(int(min_val), int(max_val)),
-    )
+
+    if color_column == "VALOR": 
+        #Rango de valores para el filtro
+        selected_range = st.sidebar.slider(
+            f"Selecciona el rango de {color_column}",
+            min_value=int(min_val),
+            max_value=int(max_val),
+            value=(int(min_val), int(max_val)),
+        )
 
     # Filtrar el GeoDataFrame por el rango seleccionado
-    filtered_gdf = gdf[(gdf[color_column] >= selected_range[0]) & (gdf[color_column] <= selected_range[1])]
+        filtered_gdf = gdf[(gdf[color_column] >= selected_range[0]) & (gdf[color_column] <= selected_range[1])]
+    else:
+        filtered_gdf = gdf
 
     tooltip_columns = st.sidebar.multiselect(
-        "Selecciona las columnas para mostrar en el tooltip", col_options_com, default=[color_column]
+        "Selecciona las columnas para mostrar en el popup", col_options_com, default=[color_column]
     )
 
     # Crear mapa base
